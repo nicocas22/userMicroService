@@ -1,35 +1,38 @@
 import { Controller, Post, Body, Delete,Get, Put, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDTO } from './dto/user.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices'
+import { UserMSG } from 'src/common/constants';
 
-@Controller('user')
+@Controller()
 export class UserController {
     constructor(private readonly userService: UserService) {
 
     }
 
-    @Post()
-    create(@Body() UserDTO: UserDTO) {
+    @MessagePattern(UserMSG.CREATE)
+    create(@Payload() UserDTO: UserDTO) {
         return this.userService.create(UserDTO);
     }
 
-    @Get()
+    @MessagePattern(UserMSG.FIND_ALL)
     findAll() {
         return this.userService.findAll();
     }
 
-    @Get(':id')
-    findOne(@Param('íd') id: string) {
+    @MessagePattern(UserMSG.FIND_ONE)
+    findOne(@Payload('íd') id: string) {
         return this.userService.findOne(id);
     }
 
-    @Put(':id')
-    update(@Param('id') id: string, @Body() userDTO: UserDTO) {
-        return this.userService.update(id,userDTO);
+    @MessagePattern(UserMSG.UPDATE)
+    update(@Payload('id') payload: any) {
+        return this.userService.update(payload.id, payload.userDTO);
     }
 
-    @Delete(':id') 
-    delete(@Param('id') id:string) {
+    @MessagePattern(UserMSG.DELETE)
+    delete(@Payload() id:string) {
         return this.userService.delete(id)
     }
+
 }
